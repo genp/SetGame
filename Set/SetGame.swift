@@ -52,6 +52,10 @@ class SetGame
         return false
     }
     
+    func drawCard() {
+        displayedCards.append(cardDeck.draw()!)
+    }
+    
     init(numberOfCardsToStart: Int){
         assert(numberOfCardsToStart < 81, "Set.init(\(numberOfCardsToStart)) must be less than 81")
         
