@@ -94,9 +94,7 @@ class ViewController: UIViewController {
             cardButtons[index].isEnabled = true
             print("\(index) : \(game.displayedCards[index].description)")
             cardButtons[index].backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-            //cardButtons[index].titleLabel?.text = game.displayedCards[index].description
             stringify(card: game.displayedCards[index], for: cardButtons[index])
-            print("card \(index) \(game.displayedCards[index].description)")
             
             if game.selectedCards.contains(game.displayedCards[index]) {
                 cardButtons[index].layer.borderWidth = 3.0
@@ -113,12 +111,12 @@ class ViewController: UIViewController {
     }
     
     private func stringify(card: Card, for button: UIButton) {
-        // TODO
 
         var shape = ""
         var cardShapeWithNumber = ""
         var shading = 1.0
-        var color: UIColor
+        var fgColor: UIColor
+        var strokeColor: UIColor
         
         switch card.shape {
             case Card.Attribute.one: shape = "▲"
@@ -132,28 +130,35 @@ class ViewController: UIViewController {
             case Card.Attribute.three: cardShapeWithNumber = String(repeating: shape, count: 3)
         }
         
-        
         switch card.shading {
             case Card.Attribute.one: shading = 0.0
-            case Card.Attribute.two: shading = 0.15
+            case Card.Attribute.two: shading = 0.5
             case Card.Attribute.three: shading = 1.0
         }
         
         switch card.color {
-        case Card.Attribute.one: color = UIColor(red: 1.0, green: 0.0, blue: 0.0, alpha: CGFloat(shading))
-        case Card.Attribute.two: color = UIColor(red: 0.0, green: 1.0, blue: 0.0, alpha: CGFloat(shading))
-        case Card.Attribute.three: color = UIColor(red: 0.0, green: 0.0, blue: 1.0, alpha: CGFloat(shading))
+        case Card.Attribute.one:
+                fgColor = UIColor(red: 1.0, green: 0.0, blue: 0.0, alpha: CGFloat(shading))
+                strokeColor = UIColor(red: 1.0, green: 0.0, blue: 0.0, alpha: CGFloat(1.0-shading))
+        case Card.Attribute.two:
+            fgColor = UIColor(red: 0.0, green: 1.0, blue: 0.0, alpha: CGFloat(shading))
+            strokeColor = UIColor(red: 0.0, green: 1.0, blue: 0.0, alpha: CGFloat(1.0-shading))
+        case Card.Attribute.three:
+            fgColor = UIColor(red: 0.0, green: 0.0, blue: 1.0, alpha: CGFloat(shading))
+            strokeColor = UIColor(red: 0.0, green: 0.0, blue: 1.0, alpha: CGFloat(1.0-shading))
         }
         
         let font = UIFont.systemFont(ofSize: 20)
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
-            .strokeColor: color
+            .foregroundColor: fgColor,
+            .strokeColor: strokeColor,
+//            .strokeWidth: 3.0
             
         ]
         let attributedString = NSAttributedString(string: cardShapeWithNumber, attributes: attributes)
         button.setAttributedTitle(attributedString, for: UIControl.State.normal)
-        //button.backgroundColor = #colorLiteral(red: 1, green: 0.5781051517, blue: 0, alpha: 1)
+
     }
     
 }
