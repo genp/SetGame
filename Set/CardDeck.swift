@@ -24,6 +24,9 @@ struct CardDeck
         }
     }
     
+    var cardsLeft: Int {
+        return cards.count
+    }
     
     mutating func draw() -> Card? {
         if cards.count > 0 {

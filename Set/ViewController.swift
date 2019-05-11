@@ -17,9 +17,8 @@ class ViewController: UIViewController {
         for button in cardButtons {
             button.layer.cornerRadius = 8.0
         }
-        
+        dealButton.setTitleColor(UIColor.gray, for: .disabled)
         updateViewFromModel() 
-
     }
 
     @IBOutlet private var cardButtons: [UIButton]!
@@ -38,20 +37,16 @@ class ViewController: UIViewController {
     }
     
     @IBAction func touchCard(_ sender: UIButton) {
-        print("a card got touched")
-        let cardIndex = cardButtons.firstIndex(of: sender)!
-        game.select(card: game.displayedCards[cardIndex])
+        let index = cardButtons.firstIndex(of: sender)!
+        let card = game.displayedCards[index]
+        print("card \(card) touched")
+        game.select(card: card)
         updateViewFromModel()
         
     }
     @IBAction func dealThreeMoreCards(_ sender: UIButton) {
-        if game.displayedCards.count >= 24 {
-            print("Card table full")
-            return
-        }
-        for _ in 1...3 {
-            game.drawCard()
-        }
+        print("deal more cards")
+        game.deal(numCards: 3)
         updateViewFromModel()
     }
     
@@ -73,92 +68,82 @@ class ViewController: UIViewController {
         for button in cardButtons {
             button.isEnabled = false
             button.setAttributedTitle(NSAttributedString(string: ""), for: UIControl.State.normal)
-            button.backgroundColor = UIColor(red: 0.0, green: 0.0, blue: 1.0, alpha:0.0)
+            button.backgroundColor = UIColor(red: 0.0, green: 0.0, blue: 1.0, alpha:0.2)
             button.layer.borderWidth = 0.0
-
         }
     }
     
     private func updateViewFromModel() {
-        
         clearButtons()
         
-        if game.displayedCards.count < 12 {
-            for _ in game.displayedCards.count..<12 {
-                game.drawCard()
-            }
-        }
-        
-        
         for index in 0..<game.displayedCards.count {
-            cardButtons[index].isEnabled = true
-            print("\(index) : \(game.displayedCards[index].description)")
-            cardButtons[index].backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-            stringify(card: game.displayedCards[index], for: cardButtons[index])
+            let button = cardButtons[index]
+            button.isEnabled = true
+            button.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+            let card = game.displayedCards[index]
+            stringify(card: card, for: button)
             
-            if game.selectedCards.contains(game.displayedCards[index]) {
-                cardButtons[index].layer.borderWidth = 3.0
-                cardButtons[index].layer.borderColor = UIColor.blue.cgColor
+            if game.selectedCards.contains(card) {
+                button.layer.borderWidth = 3.0
+                button.layer.borderColor = UIColor.blue.cgColor
             } else {
-                cardButtons[index].layer.borderWidth = 0.0
+                button.layer.borderWidth = 0.0
             }
         }
-        if game.displayedCards.count >= 24 {
-            dealButton.isEnabled = false
-        }
+
         scoreCount = game.currentScore
     
+        if (game.displayedCards.count + 3 <= cardButtons.count) {
+            dealButton.isEnabled = true
+        } else {
+            dealButton.isEnabled = false
+        }
     }
     
     private func stringify(card: Card, for button: UIButton) {
-
-        var shape = ""
-        var cardShapeWithNumber = ""
-        var shading = 1.0
-        var fgColor: UIColor
-        var strokeColor: UIColor
-        
+        var shape = "";
         switch card.shape {
-            case Card.Attribute.one: shape = "▲"
-            case Card.Attribute.two: shape = "⚪︎"
-            case Card.Attribute.three: shape = "□"
+            case .one: shape = "▲"
+            case .two: shape = "●"
+            case .three: shape = "■"
         }
         
+        var cardShapeWithNumber = ""
         switch card.number {
-            case Card.Attribute.one: cardShapeWithNumber = shape
-            case Card.Attribute.two: cardShapeWithNumber = String(repeating: shape, count: 2)
-            case Card.Attribute.three: cardShapeWithNumber = String(repeating: shape, count: 3)
+            case .one: cardShapeWithNumber = shape
+            case .two: cardShapeWithNumber = String(repeating: shape, count: 2)
+            case .three: cardShapeWithNumber = String(repeating: shape, count: 3)
         }
         
+        var alpha : CGFloat = 1.0
+        var stroke : CGFloat = -1.0
         switch card.shading {
-            case Card.Attribute.one: shading = 0.0
-            case Card.Attribute.two: shading = 0.5
-            case Card.Attribute.three: shading = 1.0
+            case .one: /* fill */
+                /* defaults */
+                break
+            case .two: /* stripe */
+                alpha = 0.15
+            case .three: /* outline */
+                stroke = 6.0
         }
         
+        var fgColor: UIColor
         switch card.color {
-        case Card.Attribute.one:
-                fgColor = UIColor(red: 1.0, green: 0.0, blue: 0.0, alpha: CGFloat(shading))
-                strokeColor = UIColor(red: 1.0, green: 0.0, blue: 0.0, alpha: CGFloat(1.0-shading))
-        case Card.Attribute.two:
-            fgColor = UIColor(red: 0.0, green: 1.0, blue: 0.0, alpha: CGFloat(shading))
-            strokeColor = UIColor(red: 0.0, green: 1.0, blue: 0.0, alpha: CGFloat(1.0-shading))
-        case Card.Attribute.three:
-            fgColor = UIColor(red: 0.0, green: 0.0, blue: 1.0, alpha: CGFloat(shading))
-            strokeColor = UIColor(red: 0.0, green: 0.0, blue: 1.0, alpha: CGFloat(1.0-shading))
+        case .one:
+            fgColor = UIColor(red: 1, green: 0, blue: 0, alpha: alpha)
+        case .two:
+            fgColor = UIColor(red: 0, green: 1, blue: 0, alpha: alpha)
+        case .three:
+            fgColor = UIColor(red: 0, green: 0, blue: 1, alpha: alpha)
         }
         
-        let font = UIFont.systemFont(ofSize: 20)
         let attributes: [NSAttributedString.Key: Any] = [
-            .font: font,
+            .font: UIFont.systemFont(ofSize: 24),
             .foregroundColor: fgColor,
-            .strokeColor: strokeColor,
-//            .strokeWidth: 3.0
-            
+            .strokeWidth: stroke
         ]
         let attributedString = NSAttributedString(string: cardShapeWithNumber, attributes: attributes)
         button.setAttributedTitle(attributedString, for: UIControl.State.normal)
-
     }
     
 }

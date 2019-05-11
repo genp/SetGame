@@ -18,8 +18,6 @@ struct Card: Hashable, Equatable, CustomStringConvertible
         return lhs.identifier == rhs.identifier
     }
     
-//    var isFaceUp = false
-//    var isMatched = false
     private var identifier: Int
     
     private static var identifierFactory = 0
@@ -46,7 +44,6 @@ struct Card: Hashable, Equatable, CustomStringConvertible
         case one
         case two
         case three
-    
     }
     
     static var allSelectors: [(Card)->Card.Attribute] {

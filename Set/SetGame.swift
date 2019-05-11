@@ -41,9 +41,9 @@ class SetGame
     
     func checkIfMakesSet() -> Bool{
         if selectedCards.count == 3 {
-            for selector: (Card)->Card.Attribute in Card.allSelectors{
+            for selector: (Card)->Card.Attribute in Card.allSelectors {
                 let attrs = selectedCards.map({selector($0)})
-                if (!(attrs.allSame && attrs.allDifferent)) {
+                if (!(attrs.allSame || attrs.allDifferent)) {
                     return false
                 }
             }
@@ -52,23 +52,21 @@ class SetGame
         return false
     }
     
-    func drawCard() {
-        displayedCards.append(cardDeck.draw()!)
-    }
-    
-    init(numberOfCardsToStart: Int){
-        assert(numberOfCardsToStart < 81, "Set.init(\(numberOfCardsToStart)) must be less than 81")
-        
-        for _ in 1...numberOfCardsToStart {
+    func deal(numCards: Int) {
+        assert(numCards < cardDeck.cardsLeft, "Tried to deal \(numCards) with only \(cardDeck.cardsLeft) left")
+        for _ in 1...numCards {
             displayedCards.append(cardDeck.draw()!)
         }
+    }
 
+    init(numberOfCardsToStart: Int) {
+        deal(numCards: numberOfCardsToStart)
     }
 }
 
 extension Array where Element: Hashable {
     var allSame: Bool {
-        return Set(self).count == 1
+        return self.isEmpty || Set(self).count == 1
     }
     
     var allDifferent: Bool {
