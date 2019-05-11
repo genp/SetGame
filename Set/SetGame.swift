@@ -8,8 +8,7 @@
 
 import Foundation
 
-class SetGame
-{
+class SetGame {
     private(set) var cardDeck = CardDeck()
     
     private(set) var currentScore = 0
@@ -21,8 +20,9 @@ class SetGame
         // check if already selected cards make a set
         if selectedCards.count == 3 {
             if checkIfMakesSet() {
-                displayedCards = displayedCards.filter { !selectedCards.contains($0) }
-                deal(numCards: min(cardDeck.cardsLeft, 3))
+                displayedCards = displayedCards.compactMap {
+                    selectedCards.contains($0) ? cardDeck.draw() : $0
+                }
                 currentScore += 5
             } else {
                 currentScore -= 3
