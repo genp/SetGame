@@ -130,16 +130,16 @@ class ViewController: UIViewController {
         var fgColor: UIColor
         switch card.color {
         case .one:
-            fgColor = UIColor(red: 1, green: 0, blue: 0, alpha: alpha)
+            fgColor = UIColor.red
         case .two:
-            fgColor = UIColor(red: 0, green: 1, blue: 0, alpha: alpha)
+            fgColor = UIColor.green
         case .three:
-            fgColor = UIColor(red: 0, green: 0, blue: 1, alpha: alpha)
+            fgColor = UIColor.blue
         }
-        
+
         let attributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 24),
-            .foregroundColor: fgColor,
+            .foregroundColor: fgColor.withAlphaComponent(alpha),
             .strokeWidth: stroke
         ]
         let attributedString = NSAttributedString(string: cardShapeWithNumber, attributes: attributes)
